@@ -58,30 +58,30 @@ int main ( signed Argsc, char *(Args[]) )
 	assert (avfilter_init_str (bass1, NULL)>=0);
 	assert (avfilter_init_str (asplit, NULL)>=0);
 
+	assert (avfilter_link (sine, 0, asplit, 0)>=0);
+	assert (avfilter_link (asplit, 0, bass1, 0)>=0);
+	assert (avfilter_link (bass1, 0, out, 0)>=0);
+	//assert (avfilter_link (asplit, 1, out1, 0)>=0);
 	{
 		AVFilterInOut *in = avfilter_inout_alloc ();
 		AVFilterInOut *oom = avfilter_inout_alloc ();
 
-		in->name = av_strdup ("out");
-		in->filter_ctx = asplit;
-		in->pad_idx = 0;
-		in->next = 0;
-
-		oom->name =av_strdup ("in");
-		oom->filter_ctx = sine;
+		oom->name = av_strdup ("out");
+		oom->filter_ctx = out1;
 		oom->pad_idx = 0;
 		oom->next = 0;
 
-		assert (avfilter_graph_parse_ptr (fg, "[in]afifo[out]", &in, &oom, NULL)>=0);
+		in->name =av_strdup ("in");
+		in->filter_ctx = asplit;
+		in->pad_idx = 1;
+		in->next = 0;
+
+		assert (avfilter_graph_parse_ptr (fg, "[in]afifo[out]", &oom, &in, NULL)>=0);
 		// 							^^^	^
 								//	\ is the|output.
 		//								\
 		//								is the output.
-		//assert (avfilter_link (sine, 0, asplit, 0)>=0);
 	}
-	assert (avfilter_link (asplit, 0, bass1, 0)>=0);
-	assert (avfilter_link (bass1, 0, out, 0)>=0);
-	assert (avfilter_link (asplit, 1, out1, 0)>=0);
 	int r;
 
 	assert(avfilter_graph_config (fg, NULL)>=0);
