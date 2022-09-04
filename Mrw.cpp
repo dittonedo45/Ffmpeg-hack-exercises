@@ -98,9 +98,6 @@ FrissonInput (string file):
 	  {
 	    break;
 	  }
-	do
-	  {
-
 	    do
 	      {
 		avcodec_parameters_to_context (dec,
@@ -113,8 +110,6 @@ FrissonInput (string file):
 		return;
 	      }
 	    while (0);
-	  }
-	while (0);
 	avcodec_free_context (&dec);
       }
     while (0);

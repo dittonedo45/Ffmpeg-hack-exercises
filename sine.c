@@ -35,13 +35,16 @@ int main ( signed Argsc, char *(Args[]) )
 
 	av_opt_set_bin (out, "sample_rates", &enc->sample_rate,
 			sizeof(enc->sample_rate), AV_OPT_SEARCH_CHILDREN );
-	av_opt_set_bin (out, "sample_fmts", &enc->channel_layout,
+
+	av_opt_set_bin (out, "channel_layouts", &enc->channel_layout,
 			sizeof(enc->channel_layout), AV_OPT_SEARCH_CHILDREN );
+
 	av_opt_set_bin (out1, "sample_fmts", &enc->sample_fmt,
 			sizeof(enc->sample_fmt), AV_OPT_SEARCH_CHILDREN );
 	av_opt_set_bin (out1, "sample_rates", &enc->sample_rate,
 			sizeof(enc->sample_rate), AV_OPT_SEARCH_CHILDREN );
-	av_opt_set_bin (out1, "sample_fmts", &enc->channel_layout,
+
+	av_opt_set_bin (out1, "channel_layouts", &enc->channel_layout,
 			sizeof(enc->channel_layout), AV_OPT_SEARCH_CHILDREN );
 
 	assert (avfilter_init_str (sine, NULL)>=0);
@@ -84,9 +87,9 @@ int main ( signed Argsc, char *(Args[]) )
 		r=avcodec_receive_packet (enc, pkt);
 		if (r<0)
 		{
-			//printf ("%s\n", av_err2str (r));
 			continue;
 		}
+
 		av_packet_unref (pkt);
 	}
 
