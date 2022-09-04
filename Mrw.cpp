@@ -80,12 +80,12 @@ struct FrissonInput
 	stream = r;
 
 	dec = avcodec_alloc_context3 (d);
+    if (!dec)
+      {
+	      break;
+      }
 	do
 	  {
-	    if (!dec)
-	      {
-		throw 1;
-	      }
 
 	    do {
 	    avcodec_parameters_to_context (dec,
@@ -106,7 +106,7 @@ struct FrissonInput
   }
   ~FrissonInput ()
   {
-	  avcodec_free_context (&dec);
+avcodec_free_context (&dec);
     avformat_close_input (&fctx);
   }
 };
@@ -493,8 +493,7 @@ struct FrissonDeck
 
   FrissonDeck () = default;
 
-  FrissonDeck (string track,
-	       Encoder & enc, MainDeckFilter * mfd, string fg = "afifo")
+  FrissonDeck (string &track, Encoder & enc, MainDeckFilter *& mfd, string fg = "afifo")
   {
     try
     {
@@ -513,7 +512,7 @@ struct FrissonDeck
     {
       throw FrissonDeckError ();
       delete input;
-    }
+    }catch (...) {}
   }
 };
 
@@ -525,8 +524,7 @@ struct Tracklist:public vector < string > {
   }
   string get_random ()
   {
-    return vector <
-      string >::operator[](Random (0, this->end () - this->begin ()));
+    return vector <string>::operator[](Random (0, this->end () - this->begin ()));
   }
 };
 
