@@ -46,35 +46,31 @@ struct FrissonInput
   uint64_t duration;
   string filename;
 
-  void read_frame (AVPacket *& pkt)
+  void read_frame (AVPacket * &pkt)
   {
-	  while (1)
+    while (1)
+      {
+	int r (av_read_frame (fctx, pkt));
+	if (r < 0)
+	  throw r;
+	if (pkt->stream_index != stream)
 	  {
-	      int r (av_read_frame (fctx, pkt));
-	      if (r < 0)
-		      throw r;
-	      if (pkt->stream_index != stream)
-	      {
-			av_packet_unref (pkt);
-			continue;
-	      }
-
-	      duration += pkt->duration;
-	      break;
+	    av_packet_unref (pkt);
+	    continue;
 	  }
+
+	duration += pkt->duration;
+	break;
+      }
   }
 
-    FrissonInput (string file):
-	    fctx (0),
-	    dec (0),
-	    stream (-1),
-	    duration (0),
-	    filename (file)
+FrissonInput (string file):
+  fctx (0), dec (0), stream (-1), duration (0), filename (file)
   {
     int r (0);
     AVCodec *d = NULL;
 
-      r = avformat_open_input (&fctx, file.c_str (), NULL, NULL);
+    r = avformat_open_input (&fctx, file.c_str (), NULL, NULL);
 
     if (r < 0)
       {
@@ -98,22 +94,25 @@ struct FrissonInput
 	stream = r;
 
 	dec = avcodec_alloc_context3 (d);
-    if (!dec)
-      {
-	      break;
-      }
+	if (!dec)
+	  {
+	    break;
+	  }
 	do
 	  {
 
-	    do {
-	    avcodec_parameters_to_context (dec,
-					   fctx->streams[stream]->codecpar);
+	    do
+	      {
+		avcodec_parameters_to_context (dec,
+					       fctx->streams[stream]->
+					       codecpar);
 
-	    r = avcodec_open2 (dec, d, NULL);
-	    if (r < 0)
-	      break;
-	    return;
-	    } while (0);
+		r = avcodec_open2 (dec, d, NULL);
+		if (r < 0)
+		  break;
+		return;
+	      }
+	    while (0);
 	  }
 	while (0);
 	avcodec_free_context (&dec);
@@ -124,7 +123,7 @@ struct FrissonInput
   }
   ~FrissonInput ()
   {
-avcodec_free_context (&dec);
+    avcodec_free_context (&dec);
     avformat_close_input (&fctx);
   }
 };
