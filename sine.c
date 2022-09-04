@@ -89,7 +89,7 @@ int main ( signed Argsc, char *(Args[]) )
 		{
 			continue;
 		}
-
+		fwrite (pkt->data, pkt->size, 1, stdout);
 		av_packet_unref (pkt);
 	}
 
