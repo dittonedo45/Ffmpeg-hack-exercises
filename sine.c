@@ -47,6 +47,11 @@ int main ( signed Argsc, char *(Args[]) )
 	av_opt_set_bin (out1, "channel_layouts", &enc->channel_layout,
 			sizeof(enc->channel_layout), AV_OPT_SEARCH_CHILDREN );
 
+	av_opt_set_double (bass1, "in_gain", 0.88889, AV_OPT_SEARCH_CHILDREN);
+	av_opt_set_double (bass1, "out_gain", 0.48889, AV_OPT_SEARCH_CHILDREN);
+	av_opt_set (bass1, "delays", "5", AV_OPT_SEARCH_CHILDREN);
+	av_opt_set (bass1, "decays", "0.9", AV_OPT_SEARCH_CHILDREN);
+
 	assert (avfilter_init_str (sine, NULL)>=0);
 	assert (avfilter_init_str (out, NULL)>=0);
 	assert (avfilter_init_str (out1, NULL)>=0);
