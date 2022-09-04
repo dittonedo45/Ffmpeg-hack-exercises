@@ -46,6 +46,24 @@ struct FrissonInput
   uint64_t duration;
   string filename;
 
+  void read_frame (AVPacket *& pkt)
+  {
+	  while (1)
+	  {
+	      int r (av_read_frame (fctx, pkt));
+	      if (r < 0)
+		      throw r;
+	      if (pkt->stream_index != stream)
+	      {
+			av_packet_unref (pkt);
+			continue;
+	      }
+
+	      duration += pkt->duration;
+	      break;
+	  }
+  }
+
     FrissonInput (string file):
 	    fctx (0),
 	    dec (0),
@@ -649,21 +667,22 @@ _deck_mixer (FrissonDeck & in)
   AVPacket *pkt = av_packet_alloc ();
   for (;;)
     {
-      int r (av_read_frame (in.input->fctx, pkt));
-      if (r < 0)
+      try
+      {
+	(in.input->read_frame (pkt));
+      } catch (int &err)
+      {
 	break;
-      if (pkt->stream_index != in.input->stream)
-      {
-	      av_packet_unref (pkt);
-	continue;
       }
-      //in.input->duration += pkt->duration;
-      r = avcodec_send_packet (in.input->dec, pkt);
-      if (r < 0)
-      {
-	continue;
-      }
+      
+      int r(avcodec_send_packet (in.input->dec, pkt));
       av_packet_unref (pkt);
+
+      if (r < 0)
+	{
+	  continue;
+	}
+
       deck_receive_frames (in);
     }
 
