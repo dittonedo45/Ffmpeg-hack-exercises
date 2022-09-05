@@ -60,11 +60,24 @@ int main ( signed Argsc, char *(Args[]) )
 
 	assert (avfilter_link (sine, 0, asplit, 0)>=0);
 	assert (avfilter_link (asplit, 0, bass1, 0)>=0);
-	assert (avfilter_link (bass1, 0, out, 0)>=0);
+	//assert (avfilter_link (bass1, 0, out, 0)>=0);
 	//assert (avfilter_link (asplit, 1, out1, 0)>=0);
 	{
 		AVFilterInOut *in = avfilter_inout_alloc ();
 		AVFilterInOut *oom = avfilter_inout_alloc ();
+
+		oom->name = av_strdup ("out");
+		in->name =av_strdup ("in");
+
+		oom->filter_ctx = out;
+		oom->pad_idx = 0;
+		in->filter_ctx = bass1;
+		in->pad_idx = 0;
+
+		assert (avfilter_graph_parse (fg, "[in]afifo[out]", oom, in, NULL)>=0);
+
+		in = avfilter_inout_alloc ();
+		oom = avfilter_inout_alloc ();
 
 		oom->name = av_strdup ("out");
 		oom->filter_ctx = out1;
@@ -76,13 +89,9 @@ int main ( signed Argsc, char *(Args[]) )
 		in->pad_idx = 1;
 		in->next = 0;
 
-		assert (avfilter_graph_parse_ptr (fg, "[in]afifo[out]", &oom, &in, NULL)>=0);
-		// 							^^^	^
-								//	\ is the|output.
-		//								\
-		//								is the output.
+		assert (avfilter_graph_parse (fg, "[in]afifo[out]", oom, in, NULL)>=0);
+
 	}
-	int r;
 
 	assert(avfilter_graph_config (fg, NULL)>=0);
 
