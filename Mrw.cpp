@@ -227,8 +227,6 @@ struct FrissonDeckFilter
 	      r =
 		avfilter_graph_parse_ptr (fg, filter_graph.c_str (), &ins,
 					  &outs, 0);
-	      avfilter_inout_free (&ins);
-	      avfilter_inout_free (&outs);
 	    }
 	    if (r < 0)
 	      {
@@ -242,8 +240,6 @@ struct FrissonDeckFilter
 	    return;
 	  }
 	while (0);
-	avfilter_inout_free (&ins);
-	avfilter_inout_free (&outs);
       }
     while (0);
     avfilter_graph_free (&fg);
@@ -344,8 +340,6 @@ struct MainDeckFilter
 	      r =
 		avfilter_graph_parse_ptr (fg, filter_graph.c_str (), &ins,
 					  &outs, 0);
-	      avfilter_inout_free (&ins);
-	      avfilter_inout_free (&outs);
 	    }
 	    if (r < 0)
 	      {
@@ -359,8 +353,6 @@ struct MainDeckFilter
 	    return false;
 	  }
 	while (0);
-	avfilter_inout_free (&ins);
-	avfilter_inout_free (&outs);
       }
     while (0);
     avfilter_graph_free (&fg);
@@ -463,8 +455,6 @@ MainDeckFilter (Encoder & encoder, string filter_graph = "[in:0] [in:1] amerge [
 	      r =
 		avfilter_graph_parse_ptr (fg, filter_graph.c_str (), &ins,
 					  &outs, 0);
-	      avfilter_inout_free (&ins);
-	      avfilter_inout_free (&outs);
 	    }
 	    if (r < 0)
 	      {
@@ -478,8 +468,6 @@ MainDeckFilter (Encoder & encoder, string filter_graph = "[in:0] [in:1] amerge [
 	    return;
 	  }
 	while (0);
-	avfilter_inout_free (&ins);
-	avfilter_inout_free (&outs);
       }
     while (0);
     avfilter_graph_free (&fg);
@@ -761,7 +749,8 @@ main (int argsc, char **args)
   FILE *fp = fopen ("mixxpy.py", "r");
   if (!fp)
     return 1;
-  PyRun_AnyFileEx (fp, "mixxpy.py", 1);
+  if (PyRun_AnyFileEx (fp, "mixxpy.py", 1))
+	  throw 1;
 
   Encoder enc = Encoder ();
   MainDeckFilter mdf = MainDeckFilter (enc);
