@@ -107,7 +107,7 @@ pip:
 
 	assert ((asplit = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("asplit"), NULL))>=0);
 	assert ((out = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffersink"), NULL))>=0);
-	assert ((out1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffersink"), NULL))>=0);
+	//assert ((out1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffersink"), NULL))>=0);
 	assert ((bass1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("afifo"), NULL))>=0);
 
 	av_opt_set_bin (out, "sample_fmts", &enc->sample_fmt,
@@ -119,6 +119,7 @@ pip:
 	av_opt_set_bin (out, "channel_layouts", &enc->channel_layout,
 			sizeof(enc->channel_layout), AV_OPT_SEARCH_CHILDREN );
 
+	/*
 	av_opt_set_bin (out1, "sample_fmts", &enc->sample_fmt,
 			sizeof(enc->sample_fmt), AV_OPT_SEARCH_CHILDREN );
 	av_opt_set_bin (out1, "sample_rates", &enc->sample_rate,
@@ -126,7 +127,7 @@ pip:
 
 	av_opt_set_bin (out1, "channel_layouts", &enc->channel_layout,
 			sizeof(enc->channel_layout), AV_OPT_SEARCH_CHILDREN );
-
+	*/
 	/*
 	av_opt_set_double (bass1, "in_gain", 0.88889, AV_OPT_SEARCH_CHILDREN);
 	av_opt_set_double (bass1, "out_gain", 0.48889, AV_OPT_SEARCH_CHILDREN);
@@ -138,7 +139,8 @@ pip:
 	assert (avfilter_init_str (sine, NULL)>=0);
 
 	assert (avfilter_init_str (out, NULL)>=0);
-	assert (avfilter_init_str (out1, NULL)>=0);
+	//assert (avfilter_init_str (out1, NULL)>=0);
+
 	assert (avfilter_init_str (bass1, NULL)>=0);
 	assert (avfilter_init_str (asplit, NULL)>=0);
 
@@ -156,23 +158,16 @@ pip:
 		in->filter_ctx = bass1;
 		in->pad_idx = 0;
 
-		assert (avfilter_graph_parse (fg, "[in]afifo[out]", oom, in, NULL)>=0);
+		assert (avfilter_graph_parse (fg, "[in] lowshelf [out]", oom, in, NULL)>=0);
 
 		in = avfilter_inout_alloc ();
-		oom = avfilter_inout_alloc ();
-
-		oom->name = av_strdup ("out");
-		oom->filter_ctx = out1;
-		oom->pad_idx = 0;
-		oom->next = 0;
 
 		in->name =av_strdup ("in");
 		in->filter_ctx = asplit;
 		in->pad_idx = 1;
 		in->next = 0;
 
-		assert (avfilter_graph_parse (fg, "[in]afifo[out]", oom, in, NULL)>=0);
-
+		assert (avfilter_graph_parse (fg, "[in] anullsink ", NULL, in, NULL)>=0);
 	}
 
 
@@ -181,7 +176,7 @@ pip:
 	AVFrame *frame=av_frame_alloc ();
 
 	AVFilterContext *oops[2]={
-		out, out1
+		out
 	};
 	int x=0;
 
@@ -213,7 +208,7 @@ pip:
 
 		if (r < 0 ) continue;
 
-		r = av_buffersink_get_frame (oops[x=!x], frame);
+		r = av_buffersink_get_frame (oops[x], frame);
 
 		if (r<0)
 		{
