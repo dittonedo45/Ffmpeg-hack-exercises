@@ -154,12 +154,15 @@ main (int argsc, char **args)
     assert (avfilter_graph_config (fg, 0)>=0);
 
     av_log_set_callback (0);
-    const char *ans = "My name is Eddington.";
-    int len=strlen (ans);
 
     espeak_SetVoiceByName ("robert");
-  espeak_Synth (ans, 4, 0, POS_CHARACTER, len, espeakCHARS_UTF8, NULL,
-				(void*) simp);
+    for (char **p=args+1; p && *p; p++)
+    {
+	    const char *ans = *p;
+	    int len=strlen (ans);
+	  espeak_Synth (ans, 4, 0, POS_CHARACTER, len, espeakCHARS_UTF8, NULL,
+					(void*) simp);
+    }
   espeak_Synchronize ();
   return (0);
 }
