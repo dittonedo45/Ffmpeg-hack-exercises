@@ -91,7 +91,8 @@ pip:
 
 	assert (avcodec_open2 (enc, e, 0)>=0);
 
-	assert ((sine = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffer"), NULL))>=0);
+	assert ((sine = avfilter_graph_alloc_filter (fg,
+		avfilter_get_by_name ("abuffer"), NULL))>=0);
 	av_opt_set_q (sine, "time_base", dec->time_base, AV_OPT_SEARCH_CHILDREN);
 	av_opt_set_int (sine, "sample_rate", dec->sample_rate, AV_OPT_SEARCH_CHILDREN);
 	av_opt_set_int (sine, "sample_fmt", dec->sample_fmt, AV_OPT_SEARCH_CHILDREN);
