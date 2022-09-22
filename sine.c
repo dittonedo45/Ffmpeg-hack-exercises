@@ -109,7 +109,7 @@ pip:
 	assert ((asplit = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("asplit"), NULL))>=0);
 	assert ((out = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffersink"), NULL))>=0);
 	assert ((out1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("abuffersink"), NULL))>=0);
-	assert ((bass1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("afifo"), NULL))>=0);
+	assert ((bass1 = avfilter_graph_alloc_filter (fg, avfilter_get_by_name ("asetrate"), NULL))>=0);
 
 	av_opt_set_bin (out, "sample_fmts", &enc->sample_fmt,
 			sizeof(enc->sample_fmt), AV_OPT_SEARCH_CHILDREN );
@@ -140,6 +140,7 @@ pip:
 
 	assert (avfilter_init_str (out, NULL)>=0);
 	assert (avfilter_init_str (out1, NULL)>=0);
+	av_opt_set_int (bass1, "rate", 44100*9.2, AV_OPT_SEARCH_CHILDREN);
 	assert (avfilter_init_str (bass1, NULL)>=0);
 	assert (avfilter_init_str (asplit, NULL)>=0);
 
